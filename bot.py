@@ -32,7 +32,7 @@ async def search(update: Update, context):
 
 
 # Main function to start the bot
-async def main():
+def main():
     # Create the Application object with your bot token
     application = Application.builder().token(BOT_TOKEN).build()
 
@@ -40,19 +40,20 @@ async def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("search", search))
 
-    # Start polling the bot
-    await application.run_polling()
+    # Use application.run_polling() to start polling without closing the event loop
+    application.run_polling()
 
 
 if __name__ == "__main__":
+    # Check if an event loop is already running
     try:
         loop = asyncio.get_event_loop()
         if loop.is_running():
-            # If event loop is already running, run the main function directly
-            loop.create_task(main())
+            # If the event loop is already running, run the bot directly in the current loop
+            main()
         else:
-            # If no event loop is running, start a new one
-            loop.run_until_complete(main())
+            # If no event loop is running, start the bot in a new loop
+            asyncio.run(main())
     except RuntimeError:
-        # In case of no event loop found, create a new one using asyncio.run()
+        # Handle cases where no event loop is found and start one
         asyncio.run(main())
